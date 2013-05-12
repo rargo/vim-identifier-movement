@@ -3,7 +3,7 @@ nnoremap <C-n> :call JumpToNextIndentifier()<cr>
 nnoremap <C-p> :call JumpToPrevIndentifier()<cr>
 
 function! JumpToNextIndentifier()
-	if !exists("b:did_ftplugin")
+	if !exists("b:IMovement_did_ftplugin")
 		return
 	endif
 
@@ -14,7 +14,7 @@ function! JumpToNextIndentifier()
 endfunc
 
 function! JumpToPrevIndentifier()
-	if !exists("b:did_ftplugin")
+	if !exists("b:IMovement_did_ftplugin")
 		return
 	endif
 

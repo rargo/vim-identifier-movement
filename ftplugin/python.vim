@@ -1,10 +1,10 @@
 " Only do this when not done yet for this buffer
-if exists("b:did_ftplugin")
+if exists("b:IMovement_did_ftplugin")
   finish
 endif
 
 " Don't load another plugin for this buffer
-let b:did_ftplugin = 1
+let b:IMovement_did_ftplugin = 1
 
 "basic language indentifier pattern
 let b:IMovementPatternBasic = '\w\+'
