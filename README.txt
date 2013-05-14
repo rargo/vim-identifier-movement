@@ -8,6 +8,9 @@ default key mapping:
 	<C-n>	next language indentifier
 	<C-p>	previous language indentifier
 
+It may conflict with other plugin(for example, ctrlp), 
+please modify it IndentifierMovement.vim
+
 current surpport language:
 	c, c++, vim, python
 

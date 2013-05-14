@@ -1,6 +1,6 @@
 
-nnoremap <C-n> :call JumpToNextIndentifier()<cr>
-nnoremap <C-p> :call JumpToPrevIndentifier()<cr>
+nnoremap <silent> <C-n> :call JumpToNextIndentifier()<cr>
+nnoremap <silent> <C-p> :call JumpToPrevIndentifier()<cr>
 
 function! JumpToNextIndentifier()
 	if !exists("b:IMovement_did_ftplugin")
@@ -23,6 +23,11 @@ function! JumpToPrevIndentifier()
 		call setpos('.', prevPos)
 	endif
 endfunc
+
+function! IsAComment(line, pos)
+	let syn = synIDtrans(synID(a:line, a:pos, 1))
+	return syn == hlID("Comment")
+endfunction
 
 "XXX should consider mutilbyte
 function! GetNextIndentifierPos()
@@ -73,10 +78,14 @@ function! GetNextIndentifierPos()
 			endfor
 
 			if matchExclude == 0
-				"XXX should consider visualedit col findpos[3]
-				let newpos = [0, searchLine, matchPos + 1 , 0] 
-				"echo "newpos:" . string(newpos)
-				return newpos
+				let comment = IsAComment(searchLine,matchPos)
+				"echo "comment:" . comment . "line:" . searchLine . "Pos:" . searchPos
+				if comment == 0
+					"XXX should consider visualedit col findpos[3]
+					let newpos = [0, searchLine, matchPos + 1 , 0] 
+					"echo "newpos:" . string(newpos)
+					return newpos
+				endif
 			endif
 
 			let searchPos = matchPos + len(matchStr)
@@ -148,7 +157,11 @@ function! GetPrevIndentifierPos()
 			endfor
 
 			if matchExclude == 0
-				let matchPosSave = matchPos
+				let comment = IsAComment(searchLine,matchPos)
+				"echo "comment:" . comment . "line:" . searchLine . "Pos:" . searchPos
+				if comment == 0
+					let matchPosSave = matchPos
+				endif
 			endif
 
 			let searchPosStart = matchPos + len(matchStr)
