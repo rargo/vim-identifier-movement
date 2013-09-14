@@ -14,6 +14,6 @@ let b:IMovementPatternNotCheck .= "'[^']' "
 "language keyword, exclude them
 let b:IMovementExcludeKeyword = "\\d.* "
 let b:IMovementExcludeKeyword .= "auto _Bool break case char _Complex const continue default restrict do double else enum extern float for goto if _Imaginary inline int long register return short signed sizeof static struct switch typedef union unsigned void volatile while "
-let b:IMovementExcludeKeyword .= "asm "
+let b:IMovementExcludeKeyword .= "asm __asm "
 let b:IMovementExcludeKeyword .= "uchar ushort uint ulong u32 u16 u8 uint32 uint16 uint8 int32 int16 int8 "
 let b:IMovementExcludeKeyword .= "include define ifdef ifndef endif defined "

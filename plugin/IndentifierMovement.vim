@@ -1,6 +1,6 @@
 
-nnoremap <silent> <C-n> :call JumpToNextIndentifier()<cr>
-nnoremap <silent> <C-p> :call JumpToPrevIndentifier()<cr>
+nnoremap <silent> <C-l> :call JumpToNextIndentifier()<cr>
+nnoremap <silent> <C-h> :call JumpToPrevIndentifier()<cr>
 
 function! JumpToNextIndentifier()
 	if !exists("b:IMovement_did_ftplugin")
@@ -41,25 +41,26 @@ function! GetNextIndentifierPos()
 	let pos = match(getline("."),b:IMovementPatternBasic,searchPos)
 	if pos == searchPos
 		let str = matchstr(getline("."),b:IMovementPatternBasic,searchPos)
-		let searchPos += len(str)
+		let searchPos += strchars(str)
 	endif
 	while 9
 		if searchLine > line('$')
 			return
 		endif
 
+		""echo "ReplacePattern in"
 		let lineStr = ReplacePattern(getline(searchLine),' ', patternNotCheck)
-		"echo "line:" . searchLine . " str:" . lineStr
+		""echo "line:" . searchLine . " str:" . lineStr
 
 		while 9
 			let matchPos  = match(lineStr,b:IMovementPatternBasic,searchPos)
-			"echo "matchPos:" . matchPos
+			""echo "matchPos:" . matchPos
 			if matchPos == -1
-				"echo "line search end"
+				""echo "line search end"
 				break
 			endif
 			let matchStr = matchstr(lineStr,b:IMovementPatternBasic,matchPos)
-			"echo "matchStr:" . matchStr
+			""echo "matchStr:" . matchStr
 			if matchStr == ""
 				break
 			endif
@@ -70,8 +71,8 @@ function! GetNextIndentifierPos()
 				"echo "pattern:" . pattern
 				let str = matchstr(matchStr, pattern, 0)
 				"echo "str:" . str
-				if str != "" && len(str) == len(matchStr)
-					"echo "matchExclude = 1"
+				if str != "" && strchars(str) == strchars(matchStr)
+					""echo "patternNotCheck match, pattern:" . pattern . ",str:" . str
 					let matchExclude = 1
 					break
 				endif
@@ -83,13 +84,13 @@ function! GetNextIndentifierPos()
 				if comment == 0
 					"XXX should consider visualedit col findpos[3]
 					let newpos = [0, searchLine, matchPos + 1 , 0] 
-					"echo "newpos:" . string(newpos)
+					""echo "newpos:" . string(newpos)
 					return newpos
 				endif
 			endif
 
-			let searchPos = matchPos + len(matchStr)
-			"echo "searchPos:" . searchPos
+			let searchPos = matchPos + strchars(matchStr)
+			""echo "searchPos:" . searchPos
 		endwhile
 
 		let searchPos = 0
@@ -146,9 +147,9 @@ function! GetPrevIndentifierPos()
 			let matchExclude = 0
 			"check if matchStr is a exclude pattern
 			for pattern in excludeKeyword
-				""echo "pattern:" . pattern
+				"echo "pattern:" . pattern
 				let str = matchstr(matchStr, pattern, 0)
-				""echo "str:" . str
+				"echo "str:" . str
 				if str != "" && len(str) == len(matchStr)
 					"echo "matchExclude = 1"
 					let matchExclude = 1
@@ -186,20 +187,26 @@ function! ReplacePattern(lineStr, replaceChar, patternList)
 	let patternCount = len(a:patternList)
 	"echo "patternCount:" . patternCount
 
+	"note, match startpos use byte index
+	"if it's a mutilbyte string, like "我"(in utf8,it occupy 3 bytes)
+	"it will be replace as 5 space
 	while 9
 		let matchPos = 99999999
 		let patternWhich = -1
 		let i = 0
 		let startPos = 0
+
 		"echo "startPos:" . startPos
-		"find out which pattern if the first match
+		"find out which pattern is the first match
 		for pattern in a:patternList
-			""echo "pattern:" . pattern
 			let pos  = match(lineStr,pattern,startPos)
 			if pos == -1
 				let i = i + 1
+				"echo "pattern:" . pattern . " not found"
 				continue
 			endif
+
+			"echo "pattern:" . pattern " found"
 			if pos <  matchPos
 				let patternWhich = i
 				"echo "patternWhich:" . patternWhich
@@ -215,34 +222,37 @@ function! ReplacePattern(lineStr, replaceChar, patternList)
 			break
 		endif
 
+		""echo "====>replace str "
 		"make a new replace str,replace the pattern str
 		let pattern = a:patternList[patternWhich]
 		"echo "a:patternList[patternWhich]:" . a:patternList[patternWhich]
+		let matchStr = matchstr(lineStr,pattern,matchPos)
+		let matchStrByteLen = strlen(matchStr)
+		let matchStrCharLen = strchars(matchStr)
+		""echo "matchPos:" . matchPos . ",matchStr:" . matchStr . ",char length:" .  matchStrCharLen . "byte length:" . matchStrByteLen
 
-		"echo "patternWhich:" . patternWhich
-		"echo "pattern:" . pattern
-		"echo "matchPos:" . matchPos
-		"echo "lineStr:" . lineStr
-		let str = matchstr(lineStr, pattern, matchPos)
-		"echo "str:" . str
-		let matchPosEnd = matchPos+ len(str) - 1
-
-		"echo "patternNotCheck str:" . str
 		let replaceCharList = [a:replaceChar,]
 		"echo "replaceCharList:" . string(replaceCharList)
-		let replaceList = repeat(replaceCharList,len(str))
+		let replaceList = repeat(replaceCharList,matchStrByteLen)
+		"echo "replace Str List:" . string(replaceList)
 
 		"echo "replaceList:" . string(replaceList)
 		"echo "new space replaceList:" . string(replaceList)
 		let lineStrList = split(lineStr,'\zs')
-		let lineStrList[matchPos : matchPosEnd] = replaceList[:]
-		"echo "lineStrList:" . string(lineStrList)
-		"the new string
-		let lineStr = join(lineStrList,"")
-		"echo "lineStr:" . lineStr
+		"echo "lineStrList old:" . string(lineStrList)
+		let lineStrListNew = []
+		if matchPos != 0
+			call extend(lineStrListNew, lineStrList[0 : matchPos - 1])
+		endif
+		call extend(lineStrListNew, replaceList[:])
+		call extend(lineStrListNew, lineStrList[matchPos + matchStrCharLen : ])
+		""echo "lineStrList new:" . string(lineStrList)
+		let lineStr = join(lineStrListNew,"")
+		""echo "new replace str:" . lineStr
+		""echo "<====replace str "
 
 		"let startPos = matchPos + len(str)
 	endwhile
-	""echo lineStr
+	"echo lineStr
 	return lineStr
 endfunc

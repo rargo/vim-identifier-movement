@@ -1,21 +1,20 @@
+
+change log:
+	2013.9.14: 
+		1. Add lua support
+		2. Modify default key maps to <c-l>,<c-h>
+		3. Fix multibyte problem
+
 vim plugin, one way to improve move using "w W b B",
 smartly move between language indentifier, skip language keywords,comment,strings
 
-I became a vim user for two years, and begin to write script about 2 month ago,
-if I make some mistake, please do contact me(rargo.m@gmail.com)
-
 default key mapping:
-	<C-n>	next language indentifier
-	<C-p>	previous language indentifier
-
-It may conflict with other plugin(for example, ctrlp), 
-please modify it IndentifierMovement.vim
+	<C-l>	next language indentifier
+	<C-h>	previous language indentifier
+It may conflict with other plugin,please modify it IndentifierMovement.vim
 
 current surpport language:
-	c, c++, vim, python
+	c, c++, vim, python, lua
 
-should be add in a couble of weeks:
-	lua, ruby
-
-It's not too hard to add a language surpport, please don't be afraid.
+rargo.m AT gmail.com
 
