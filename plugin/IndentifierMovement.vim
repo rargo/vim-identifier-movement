@@ -1,9 +1,7 @@
 
-nnoremap <silent> <C-l> :call JumpToNextIndentifier()<cr>
-nnoremap <silent> <C-h> :call JumpToPrevIndentifier()<cr>
-
 function! JumpToNextIndentifier()
 	if !exists("b:IMovement_did_ftplugin")
+		execute "normal w"
 		return
 	endif
 
@@ -15,6 +13,7 @@ endfunc
 
 function! JumpToPrevIndentifier()
 	if !exists("b:IMovement_did_ftplugin")
+		execute "normal b"
 		return
 	endif
 

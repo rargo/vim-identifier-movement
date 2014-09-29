@@ -16,7 +16,5 @@ default has no key mapping, please add keymap to your .vimrc, for example:
 current surpport language:
 	c, c++, vim, python, lua, java
 
-I should add all language that ctags supports, but I'm a lazy person...
-
 rargo.m@gmail.com
-
+Distributed under the same terms as Vim itself.
